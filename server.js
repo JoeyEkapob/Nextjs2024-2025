@@ -2,7 +2,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
 
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client');
+const { error } = require('console');
+const e = require('express');
 
 const prisma = new PrismaClient()
 
@@ -55,4 +57,49 @@ app.post('/book/create', async (req,res)=>{
     res.send({result:result})
 
 })
-app.listen(3001);
+app.post('/book/createManual', async (req,res)=>{
+    const result = await prisma.book.create({
+        data:{
+            isbn:'1002',
+            name: 'PHP',
+            price:850
+        }
+
+    })
+
+    res.send({result:result})
+})
+
+app.put('/book/updata/:id', async (req,res)=>{
+    try{
+        await prisma.book.update({
+            data: { 
+                isbn:'10022',
+                name:'test updata',
+                price:1000
+            },
+            where:{
+                id:parseInt(req.params.id)
+            }
+        })
+        res.send({message:'success'})
+    }catch(e){
+        res.status(500).send({error:e })
+    }
+})
+
+app.delete('/book/remove/:id', async (req,res)=>{
+    try{
+        await prisma.book.delete({
+            where:{
+                id: parseInt(req.params.id)
+            }
+        })
+        res.send({message:'success'})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+app.listen(3001, () =>{
+    console.log("sever on http://localhost:3001")
+});
