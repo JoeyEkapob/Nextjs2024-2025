@@ -2,6 +2,10 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
 
+const { PrismaClient } = require('@prisma/client')
+
+const prisma = new PrismaClient()
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
  app.get('/',(req,res)=>{
@@ -39,5 +43,16 @@ app.put('/updateCustomer/:id',(req,res)=>{
 
 app.delete('/detele/:id', (req,res)=>{
     res.send('id = ' + req.params.id)
+})
+
+app.get('/book/list', async (req,res)=>{
+    const data = await prisma.book.findMany();
+    res.send({data:data})
+})
+app.post('/book/create', async (req,res)=>{
+    const data = req.body;
+    const result = await prisma.book.create({data:data})
+    res.send({result:result})
+
 })
 app.listen(3001);
