@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const { PrismaClient } = require('@prisma/client');
 const { error } = require('console');
 const e = require('express');
+const { errorMonitor } = require('events');
 
 const prisma = new PrismaClient()
 
@@ -96,6 +97,179 @@ app.delete('/book/remove/:id', async (req,res)=>{
             }
         })
         res.send({message:'success'})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+
+app.post('/book/searh/',async (req,res)=>{
+    try{
+        const keyword =req.body.keyword;
+        const data = await prisma.book.findMany({
+            where:{
+                name:{
+                    contains:keyword
+                }
+            }
+           
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+
+app.post('/book/startwith',async(req,res)=>{
+    try{
+        const keyword =req.body.keyword;
+        const data = await prisma.book.findMany({
+            where:{
+                name:{
+                    startsWith:keyword
+                }
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+
+app.post('/book/endwith', async (req,res)=>{
+    try{
+        const keyword = req.body.keyword;
+        const data = await prisma.book.findMany({
+            where:{
+                name:{
+                    endsWith:keyword
+                }
+               
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+
+app.get('/book/orderBy',async(req,res)=>{
+    try{
+        const data = await prisma.book.findMany({
+            orderBy:{
+                price:'desc'
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+app.get('/book/gt',async (req,res)=>{
+    try{
+        const data = await prisma.book.findMany({
+            where:{
+                price:{
+                    gt:900
+                }
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+app.get('/book/lt',async (req,res)=>{
+    try{
+        const data = await prisma.book.findMany({
+            where:{
+                price:{
+                    lt:900
+                }
+            }
+        })
+        res.send({reults:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+app.get('/book/notNull', async (req,res)=>{
+    try{
+        const data = await prisma.book.findMany({
+            where:{
+                detail:{
+                    not:null
+
+                }
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+app.get('/book/isnull',async (req,res)=>{
+    try{
+        const data = await prisma.book.findMany({
+            where:{
+                detail:null
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        console.log(e)
+        res.status(500).send({error:e})
+    }
+})
+
+app.get('/book/between',async (req,res)=>{
+    try{
+        const data = await prisma.book.findMany({
+            where:{
+                price:{
+                    lte:1500,
+                    gte:900
+                }
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+app.get('/book/sum',async (req,res)=>{
+    try{
+        const data = await prisma.book.aggregate({
+            _sum:{
+                price:true
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+
+})
+app.get('/book/max',async(req,res)=>{
+    try{
+        const data = await prisma.book.aggregate({
+            _max:{
+                price:true
+            }
+        })
+        res.send({result:data})
+    }catch(e){
+        res.status(500).send({error:e})
+    }
+})
+
+app.get('/book/avg',async(req,res)=>{
+    try{
+        const data = await prisma.book.aggregate({
+            _avg:{
+                price:true
+            }
+        })
+        res.send({result:data})
     }catch(e){
         res.status(500).send({error:e})
     }
