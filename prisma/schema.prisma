@@ -9,8 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Book {
@@ -20,7 +21,31 @@ model Book {
   price Int
   detail String?
   registerDate DateTime?
+  orderDetail OrderDetail[]
+}
 
+model Customer {
+  id Int @id() @default(autoincrement())
+  name String
+  phone String
+  address String
+  Order Order[]
+}
 
- 
+model Order{
+  id Int @id() @default(autoincrement())
+  orderDate DateTime
+  payDate DateTime?
+  customerId Int
+  customer Customer @relation(fields: [customerId], references: [id])
+  orderDetail OrderDetail[]
+  
+}
+
+model OrderDetail {
+  id Int @id() @default(autoincrement())
+  orderId Int
+  bookid Int
+  book Book @relation(fields: [bookid],references: [id])
+  Order Order @relation(fields: [orderId],references: [id])
 }
